@@ -2,6 +2,12 @@
 
 return [
 
+    'default_user' => [
+        'name' => env('DEFAULT_USER_NAME', 'default'),
+        'email' => env('DEFAULT_USER_EMAIL', 'default@casadejuana.com'),
+        'password' => env('DEFAULT_USER_PASSWORD', 'qwerty123'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

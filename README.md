@@ -1,66 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LARAVEL-REAL-STATE-API (v.1.0)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is intended as the resolution API for a coding challenge in a company selection process.
+The company in question is "La casa de Juana" which is real state related company.
 
-## About Laravel
+## CHANGELOG
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The version 1.0 of this project comply only with the requirements of the challenge. In this section will inform of added dependencies to the project and their purpose.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+laravel/sanctum => API authorization package
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Considerations and assumptions
 
-## Learning Laravel
+This version considers 3 entities: "Persona", "Propiedad" y "SolicitudVisita". A "Persona" (Person entity) refers to either the owner of a "Propiedad" (real state entity) or a contact of the same. In addition we have "SolicitudVisita" (visit request entity). In terms of relationships we will consider the following:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- "SolicitudVisita" : "Persona" := 1:1 (A visit request belongs to a single person)
+- "Persona" : "SolicitudVisita" := 1:N (A single person can have multiple visit requests)
+- "SolicitudVisita" : "Propiedad" := 1:1 (A visit request is related to a single real state)
+- "Propiedad" : "SolicitudVisita" := 1:N (A real state can have multiple visit requests)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+In this version we will have minimal constraints regarding security or role considerations.
+All endpoints will be accessible for all authorized users with no scopes.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## API documentation
 
-## Laravel Sponsors
+### **/register** (POST)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+This endpoint will allow the creation of new user records into the database. The parameters constraints are, as follows:
 
-### Premium Partners
+| **name**              | **description**              | **data type** | **validations**                | **required** |
+|-----------------------|------------------------------|---------------|--------------------------------|--------------|
+| name                  | user's name                  | string        | length: min 2                  | YES          |
+| email                 | user's email                 | string        | rfc, dns, format, unique:users | YES          |
+| password              | user's password              | string        | length: min 8                  | YES          |
+| password_confirmation | user's password confirmation | string        | confirmed                      | YES          |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- Sample request
+```
+{
+    "name" : "test",
+    "email": "sample@gmail.com",
+    "password": "qweryt123",
+    "password_confirmation": "qwerty123"
+}
+```
+- Sample success response [HTTP_CODE: 201]
+```
+{
+    "success": true,
+    "data": {
+        "id": 2,
+        "email": "sample@gmail.com"
+    },
+    "message": "User registered successfully"
+}
+```
+- Sample validation error response [HTTP_CODE: 422]
+```
+{
+    "message": "The email has already been taken.",
+    "errors": {
+        "email": [
+            "The email has already been taken."
+        ]
+    }
+}
+```
 
-## Contributing
+### **/login** (POST)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+This endpoint will validate the given credentials and assign a token to the related user for API purposes.
+The parameters constraints are, as follows:
 
-## Code of Conduct
+| **name**              | **description**              | **data type** | **validations**                | **required** |
+|-----------------------|------------------------------|---------------|--------------------------------|--------------|
+| email                 | user's email                 | string        | rfc, dns, format, exists:users | YES          |
+| password              | user's password              | string        | length: min 8                  | YES          |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Sample request
+```
+{
+    "email": "sample@gmail.com",
+    "password": "qweryt123",
+}
+```
+- Sample success response [HTTP_CODE: 201]
+```
+{
+    "success": true,
+    "data": {
+        "type": "Bearer",
+        "token": "2|j5DgqVWoLCrDEIrfYaqWaveKd8wgr3z7YJqZvZp39dfee2fb"
+    },
+    "message": "User logged in successfully"
+}
+```
+- Sample validation error response [HTTP_CODE: 422]
+```
+{
+    "message": "The selected email is invalid.",
+    "errors": {
+        "email": [
+            "The selected email is invalid."
+        ]
+    }
+}
+```
+- Sample error response [HTTP_CODE: 401]
+```
+{
+    "success": false,
+    "message": "Credentials not valid"
+}
+```
 
-## Security Vulnerabilities
+## Local setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+For local setup please execute the following steps:
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Clone the repository
+2. Install PHP dependencies (```composer install```)
+   - If prompted, update composer and repeat step 2 (```composer update```)
+   - For incompatible package errors, uncomment extensions in your php.ini file by removing `;` in front of required extensions
+3. Copy .env.example into .env (```cp .env.example .env```)
+4. Set application key (```php artisan key:generate```)
+5. Create local DB
+6. Set local DB parameters in .env file (DB_* fields)
+7. Set default user credentials in .env file (DEFAULT_USER_* fields)
+8. Create tables into DB (```php artisan migrate```)
+9. Create default user record (```php artisan migrate```)
+10. Run web server (```php artisan serve```)
