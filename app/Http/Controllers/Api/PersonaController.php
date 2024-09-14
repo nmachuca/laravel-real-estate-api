@@ -113,7 +113,7 @@ class PersonaController extends Controller
             $persona = Persona::findOrFail($id);
         } catch (\Throwable $th) {
             Log::error($th->getMessage(), ["method" => __METHOD__, "line" => $th->getLine(), "trace" => $th->getTrace()]);
-            return $this->sendError("Persona no encontrada", []);
+            return $this->sendError("Persona not found", []);
         }
         $persona->delete();
         return $this->sendResponse([], 'Persona deleted successfully');
