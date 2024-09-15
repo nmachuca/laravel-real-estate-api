@@ -50,7 +50,7 @@ class PropiedadController extends Controller
         }
 
         $propiedades = $validated['pagination'] ? $propiedades->paginate($validated['elements_per_page']) : $propiedades->get();
-        return $this->sendResponse($propiedades, "List of Personas");
+        return $this->sendResponse($propiedades, "List of Propiedades");
     }
 
     /**
