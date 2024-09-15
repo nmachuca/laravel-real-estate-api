@@ -6,11 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PropiedadRequest;
 use App\Http\Requests\PropiedadStoreRequest;
 use App\Http\Requests\PropiedadUpdateRequest;
-use App\Http\Resources\PersonaResource;
 use App\Http\Resources\PropiedadResource;
-use App\Models\Persona;
 use App\Models\Propiedad;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 
@@ -62,6 +59,7 @@ class PropiedadController extends Controller
         $validated = $request->validated();
         // add record in database
         $propiedad = Propiedad::create($validated);
+        dd($propiedad);
         // send response
         return $this->sendResponse(new PropiedadResource(Propiedad::findOrFail($propiedad->id)), 'Propiedad created successfully', Response::HTTP_CREATED);
     }
