@@ -46,4 +46,5 @@ To this base URL you should concatenate the endpoint path.
 - [Auth API endpoints](authAPI.md)
 - [Persona API endpoints](personaAPI.md)
 - [Propiedad API endpoints](propiedadAPI.md)
+- [Visita API endpoints](visitaAPI.md)
 
