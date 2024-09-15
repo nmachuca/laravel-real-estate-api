@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
 class PersonaResourceTest extends TestCase
@@ -13,7 +14,6 @@ class PersonaResourceTest extends TestCase
 
     private function getUserToken() {
         $user = User::factory()->create([
-            'email' => config('app.default_user.email'),
             'password' => config('app.default_user.password'),
         ]);
         $response = $this->postJson(
@@ -103,6 +103,39 @@ class PersonaResourceTest extends TestCase
             ['Authorization' => "Bearer $token"])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['elements_per_page','sort_asc']);
+    }
+
+    public function test_index_filter_name_count()
+    {
+        Artisan::call('db:seed');
+        $token = $this->getUserToken();
+        $this->postJson(
+            "/api/personas",
+            [
+                "pagination" => false,
+                "filters" => true,
+                "nombre" => "a"
+            ],
+            ['Authorization' => "Bearer $token"])
+            ->assertStatus(200)
+            ->assertJsonCount(10, "data");
+    }
+
+    public function test_index_filter_multiple_count()
+    {
+        Artisan::call('db:seed');
+        $token = $this->getUserToken();
+        $this->postJson(
+            "/api/personas",
+            [
+                "pagination" => false,
+                "filters" => true,
+                "email" => ".net",
+                "nombre" => "a"
+            ],
+            ['Authorization' => "Bearer $token"])
+            ->assertStatus(200)
+            ->assertJsonCount(5, "data");
     }
 
 }

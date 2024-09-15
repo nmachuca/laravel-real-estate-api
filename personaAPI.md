@@ -22,9 +22,9 @@ Request headers
 - Sample body request
 ```
 {
-    "nombre":"test"
+    "nombre":"test",
     "email": "sample@gmail.com",
-    "telefono": "+56998765432",
+    "telefono": "+56998765432"
 }
 ```
 - Sample success response [HTTP_CODE: 201]
